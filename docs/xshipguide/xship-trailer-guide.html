@@ -141,11 +141,21 @@
 <p>Je nach Gerät und installierter Software wählt xShip automatisch den besten Player:</p>
 
 <table class="player-table">
-  <tr><th>Player</th><th>Wann?</th><th>Vorteil</th></tr>
-  <tr><td>SmartTube</td><td>Fire TV / Android TV (wenn installiert)</td><td>Kein API-Key nötig, spielt auch altersbeschränkte Trailer</td></tr>
+  <tr><th>Player</th><th>Plattform</th><th>Vorteil</th></tr>
+  <tr><td><a href="https://smarttubeapp.github.io/" target="_blank">SmartTube</a></td><td>Fire TV / Android TV</td><td>Kein API-Key nötig, spielt auch altersbeschränkte Trailer</td></tr>
   <tr><td>YouTube-Addon</td><td>Windows / Kodi ohne SmartTube</td><td>Integration ins Kodi-Interface</td></tr>
-  <tr><td>Kodi-Player</td><td>IMDB-Trailer (MP4-Dateien)</td><td>Braucht gar keine Zusatz-App</td></tr>
+  <tr><td>Kodi-Player</td><td>Alle (nur bei IMDB-Trailern)</td><td>Braucht gar keine Zusatz-App</td></tr>
 </table>
+
+<div class="tip">
+  <strong>Empfehlung für Android/Fire TV:</strong> Auf Android-Geräten können sowohl SmartTube als auch das YouTube-Addon verwendet werden.
+  <strong>SmartTube wird bevorzugt</strong>, weil es keinen eigenen API-Key benötigt und insgesamt weniger Konfiguration erfordert.
+</div>
+
+<div class="warn">
+  <strong>Wichtig beim YouTube-Addon:</strong> In den YouTube-Addon-Einstellungen wird sowohl nach einem <em>API-Key</em> als auch nach einem <em>API-Secret</em> gefragt.
+  <strong>Nur den API-Key eintragen! Das API-Secret-Feld leer lassen.</strong> Das Secret wird für die Videowiedergabe nicht benötigt und wäre ein unnötiges Sicherheitsrisiko.
+</div>
 
 <div class="example">
   <strong>Beispiel Fire TV:</strong> SmartTube öffnet sich kurz, spielt den Trailer, und du landest danach wieder in der xShip-Filmliste.<br>
