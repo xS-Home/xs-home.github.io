@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xShip - Quellen-Cache: Unter der Haube</title>
+<style>
+  :root { --accent: #1a73e8; --bg: #f8f9fa; --card: #fff; --text: #333; --muted: #666; --border: #e0e0e0; --green: #34a853; --yellow: #fbbc04; --red: #ea4335; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; color: var(--accent); margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.15rem; color: var(--text); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  p { margin-bottom: 1rem; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .card-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .example { background: #e8f0fe; border-left: 4px solid var(--accent); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .example strong { color: var(--accent); }
+  .tip { background: #e6f4ea; border-left: 4px solid var(--green); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip strong { color: var(--green); }
+  .warn { background: #fef7e0; border-left: 4px solid var(--yellow); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn strong { color: #e37400; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); }
+  th { background: var(--bg); font-weight: 600; }
+  ul { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red { background: var(--red); }
+  .phase { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
+  .phase-1 { background: #e8f0fe; }
+  .phase-2 { background: #e6f4ea; }
+  .phase-3 { background: #fef7e0; }
+  .phase-done { background: #f1f3f4; }
+  .phase-label { font-weight: 700; min-width: 100px; }
+  .flow { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+  .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem; }
+  .flow-arrow { color: var(--accent); font-weight: 700; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+
+<h1>Quellen-Cache: Unter der Haube</h1>
+<p class="subtitle">Wie xShip deine Filme verwaltet, aktuell hält und dabei sparsam mit Ressourcen umgeht.</p>
+
+<p>Dieses Dokument erklärt die technischen Details hinter dem Quellen-Cache. Es richtet sich an fortgeschrittene Nutzer, die verstehen möchten, was im Hintergrund passiert, wie Filme durch das System fließen und welche Schutzmechanismen dafür sorgen, dass nichts außer Kontrolle gerät.</p>
+
+<!-- ============================================================ -->
+<h2>Wann startet der Hintergrund-Scan?</h2>
+
+<div class="card">
+  <p>Der Hintergrund-Scan läuft <strong>nicht</strong> einfach los, sobald Kodi startet. Er wartet, bis du xShip das erste Mal öffnest. Solange du z.B. nur Netflix oder YouTube benutzt, passiert im Hintergrund nichts von xShip.</p>
+  <p>Erst wenn du xShip öffnest, wird ein internes Signal gesetzt. Ab diesem Moment prüft xShip alle 10 Sekunden, ob Arbeit ansteht.</p>
+</div>
+
+<div class="tip">
+  <strong>Warum?</strong> Kodi-Addons sollen keine Ressourcen verbrauchen, wenn der Nutzer sie gar nicht benutzt. Wenn du xShip nicht öffnest, merkt dein Fire TV nichts davon.
+</div>
+
+<!-- ============================================================ -->
+<h2>Der Lebenszyklus eines Films</h2>
+
+<p>Jeder Film im Cache durchläuft einen klaren Lebenszyklus. Das System arbeitet dabei selbstständig und hält sich an deine Einstellungen.</p>
+
+<h3>Wie Filme in den Cache kommen</h3>
+
+<div class="card">
+  <p>Es gibt vier Wege, wie ein Film im Cache landen kann:</p>
+  <table>
+    <tr><th>Weg</th><th>Wann</th><th>Beispiel</th></tr>
+    <tr><td><strong>Filmlisten</strong></td><td>Automatisch beim Hintergrund-Scan</td><td>"Filme - Neu", "Im Trend", "Im Kino"</td></tr>
+    <tr><td><strong>Provider</strong></td><td>Automatisch beim Hintergrund-Scan</td><td>"Filme - Im Netz" (filmpalast, einschalten...)</td></tr>
+    <tr><td><strong>Trailer</strong></td><td>Wenn du einen Trailer startest</td><td>Du schaust den Trailer von "Inception"</td></tr>
+    <tr><td><strong>Manuell</strong></td><td>Wenn du "Quellen scannen" wählst</td><td>Rechtsklick auf einen Film</td></tr>
+  </table>
+</div>
+
+<h3>Die vier Phasen</h3>
+
+<p>Jeder Film durchläuft automatisch vier Phasen. Das System entscheidet selbst, was als nächstes zu tun ist:</p>
+
+<div class="phase phase-1">
+  <span class="phase-label">Phase 1a</span>
+  <span>Erste Suche: Ein Anbieter wird kontaktiert. Gibt es Quellen?</span>
+</div>
+<div class="phase phase-2">
+  <span class="phase-label">Phase 1b</span>
+  <span>Qualität prüfen: Gefundene Quellen werden auf Auflösung und Größe geprüft (Probing).</span>
+</div>
+<div class="phase phase-3">
+  <span class="phase-label">Phase 2</span>
+  <span>Bessere Quellen suchen: Noch kein HD? Weitere Anbieter werden kontaktiert.</span>
+</div>
+<div class="phase phase-done">
+  <span class="phase-label">Fertig</span>
+  <span>HD gefunden oder alle Anbieter durchsucht. Der Film bekommt seinen farbigen Punkt.</span>
+</div>
+
+<div class="flow">
+  <span class="flow-step">Film eingefügt</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">Provider suchen</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">Quellen prüfen</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">HD gefunden?</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step"><span class="dot dot-green"></span> oder <span class="dot dot-yellow"></span> oder <span class="dot dot-red"></span></span>
+</div>
+
+<!-- ============================================================ -->
+<h2>Automatische Qualitätsverbesserung</h2>
+
+<div class="card">
+  <p>Streaming-Seiten ändern ihr Angebot ständig. Ein Film, der gestern nur in SD verfügbar war, kann heute in HD bereitstehen. Deshalb prüft xShip regelmäßig, ob es bessere Quellen gibt.</p>
+
+  <p><strong>Alle 5 Minuten</strong> wird genau ein Film für einen erneuten Scan ausgewählt:</p>
+  <ol style="margin: 0.5rem 0 0.5rem 1.5rem;">
+    <li>Zuerst: Filme mit <span class="dot dot-yellow"></span> gelbem oder <span class="dot dot-red"></span> rotem Punkt, die seit mindestens 72 Stunden nicht mehr geprüft wurden</li>
+    <li>Wenn kein solcher Film übrig ist: Der älteste Film im Cache, egal welche Farbe</li>
+  </ol>
+  <p>So werden Filme mit schlechter oder fehlender Qualität bevorzugt erneut geprüft, während grüne Filme (HD) erst drankommen, wenn sonst nichts zu tun ist.</p>
+</div>
+
+<div class="tip">
+  <strong>Gleichmäßig statt stoßweise:</strong> Statt alle 14 Tage den gesamten Cache auf einmal zu erneuern (was die Internetleitung belasten würde), wird immer nur ein Film alle 5 Minuten erneuert. Das verteilt die Last gleichmäßig und ist praktisch unsichtbar.
+</div>
+
+<div class="warn">
+  <strong>Was nicht erneuert wird:</strong> Filme, die du manuell gescannt hast, und Trailer-Filme werden beim automatischen Refresh übersprungen. Nur Filme aus deinen ausgewählten Listen werden aktualisiert.
+</div>
+
+<!-- ============================================================ -->
+<h2>Intelligente Drosselung</h2>
+
+<div class="card">
+  <p>Der Hintergrund-Scan passt sich automatisch an, was du gerade machst. Du musst nichts einstellen, es funktioniert von allein:</p>
+
+  <table>
+    <tr><th>Situation</th><th>Was passiert</th><th>Standard</th></tr>
+    <tr><td>Du bist in xShip unterwegs</td><td>Volle Scan-Geschwindigkeit</td><td>Immer</td></tr>
+    <tr><td>Du schaust einen Film in Kodi</td><td>Scan wird gedrosselt (1 Anfrage statt 5)</td><td>Gedrosselt</td></tr>
+    <tr><td>Ein anderes Addon spielt</td><td>Scan pausiert komplett</td><td>Aus</td></tr>
+    <tr><td>Bildschirmschoner ist aktiv</td><td>Scan wird gedrosselt</td><td>Gedrosselt</td></tr>
+    <tr><td>Du hast einen Trailer gestartet</td><td>Dieser eine Film wird immer fertig gescannt</td><td>Immer</td></tr>
+  </table>
+</div>
+
+<div class="tip">
+  <strong>Trailer-Filme sind geschützt:</strong> Wenn du einen Trailer anschaust, wird der zugehörige Film mit höchster Priorität gescannt. Selbst wenn alle anderen Einstellungen den Scan pausieren würden, läuft der Scan für diesen einen Film weiter, bis er abgeschlossen ist.
+</div>
+
+<!-- ============================================================ -->
+<h2>Speicherverwaltung</h2>
+
+<div class="card">
+  <p class="card-title">Das Max-Limit schützt deinen Speicher</p>
+  <p>Du kannst einstellen, wie viele Filme maximal im Cache sein dürfen (Standard: 1000). Der Cache wächst nie über dieses Limit hinaus.</p>
+  <p>Wenn das Limit erreicht ist, werden keine neuen Filme mehr hinzugefügt, bis Platz frei wird. Es werden <strong>nicht</strong> erst Filme eingefügt und dann wieder gelöscht, das wäre Verschwendung.</p>
+</div>
+
+<div class="card">
+  <p class="card-title">Trailer und manuelle Scans zählen nicht</p>
+  <p>Filme, die du über einen Trailer oder manuellen Scan in den Cache gebracht hast, belegen keinen Platz im Max-Limit. Sie sind Bonuseinträge, die dein Kontingent für die automatischen Listen nicht schmälern.</p>
+</div>
+
+<div class="card">
+  <p class="card-title">Automatische Bereinigung</p>
+  <p>Der Cache räumt sich regelmäßig selbst auf:</p>
+  <ul>
+    <li><strong>Gesehene Filme:</strong> Filme, die du angeschaut hast, werden automatisch aus dem Cache entfernt. Du wirst sie vermutlich nicht sofort nochmal schauen.</li>
+    <li><strong>Abgelaufene Quellen:</strong> Streaming-Links sind nicht ewig gültig. Nach 14 Tagen (einstellbar) werden alte Quellen entfernt und beim nächsten Scan erneuert.</li>
+    <li><strong>Überzählige Filme:</strong> Wenn das Max-Limit überschritten wird, werden die ältesten Filme entfernt.</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2>Die zwei Taktgeber</h2>
+
+<div class="card">
+  <p>Hinter den Kulissen arbeiten zwei Timer mit unterschiedlichen Aufgaben:</p>
+
+  <table>
+    <tr><th>Timer</th><th>Intervall</th><th>Aufgabe</th></tr>
+    <tr>
+      <td><strong>Probe-Cycle</strong></td>
+      <td>Alle 5 Minuten</td>
+      <td>Filme scannen, Quellen prüfen, 1 Film erneuern</td>
+    </tr>
+    <tr>
+      <td><strong>Stunden-Cycle</strong></td>
+      <td>Einstellbar (Standard: 2 Stunden)</td>
+      <td>TMDB-Listen aktualisieren, gesehene Filme entfernen, Max-Limit durchsetzen</td>
+    </tr>
+  </table>
+
+  <p>Der 5-Minuten-Takt ist das Arbeitstier: Er scannt Quellen, prüft Auflösungen und erneuert veraltete Einträge. Der Stunden-Takt kümmert sich um das große Bild: neue Filme entdecken, Aufräumen, Limits einhalten.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>SmartTube und RAM-Schutz</h2>
+
+<div class="card">
+  <p>Auf Fire TV kann xShip Trailer über <strong>SmartTube</strong> abspielen (bessere Qualität, keine Werbung). Aber SmartTube braucht viel Arbeitsspeicher.</p>
+  <p>Auf Geräten mit wenig RAM (z.B. Fire TV Stick 3. Gen mit 1 GB) prüft xShip vor dem Start, ob genug Speicher frei ist. Wenn nicht, wird der Trailer stattdessen über das YouTube-Addon abgespielt. Das verhindert, dass Kodi vom System beendet wird.</p>
+</div>
+
+<div class="tip">
+  <strong>Automatisch, kein Eingriff nötig:</strong> Du musst nichts einstellen. xShip erkennt selbst, ob dein Gerät genug RAM hat, und wählt den passenden Player.
+</div>
+
+<!-- ============================================================ -->
+<h2>Häufige Bedenken</h2>
+
+<div class="card">
+  <h3>Erzeugt der Cache viel Netzwerk-Traffic?</h3>
+  <p>Nein. Der Scanner arbeitet sparsam: maximal 5 Anfragen gleichzeitig, mit 3 Sekunden Pause dazwischen. Bei Videoplayback oder Bildschirmschoner wird automatisch auf 1 Anfrage alle 10 Sekunden gedrosselt. Das ist vergleichbar mit dem Öffnen einer Webseite alle paar Sekunden.</p>
+</div>
+
+<div class="card">
+  <h3>Verbraucht der Cache viel Speicherplatz?</h3>
+  <p>Die Datenbank ist typischerweise 200-500 KB groß, selbst bei 1000 Filmen. Das ist weniger als ein einzelnes Foto.</p>
+</div>
+
+<div class="card">
+  <h3>Läuft da etwas ohne meine Kontrolle?</h3>
+  <p>Du hast volle Kontrolle:</p>
+  <ul>
+    <li>Der Scan startet erst, wenn du xShip öffnest</li>
+    <li>Du kannst den Hintergrund-Scan jederzeit deaktivieren</li>
+    <li>Du bestimmst, welche Listen gescannt werden</li>
+    <li>Du bestimmst die Scan-Geschwindigkeit und Drosselung</li>
+    <li>Du kannst den gesamten Cache jederzeit löschen</li>
+    <li>Alle Einstellungen sind unter xShip-Einstellungen > Quellen-Cache zugänglich</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Was passiert, wenn ich Listen abwähle?</h3>
+  <p>Filme aus abgewählten Listen bleiben im Cache, werden aber nicht mehr erneuert. Mit der Zeit werden sie durch das Max-Limit oder ablaufende Gültigkeit natürlich verdrängt. Es wird nichts sofort gelöscht.</p>
+</div>
+
+<div class="card">
+  <h3>Kann der Cache mein Gerät verlangsamen?</h3>
+  <p>Nein. Der Scanner erkennt automatisch, ob du gerade einen Film schaust, ein anderes Addon benutzt oder der Bildschirmschoner läuft, und passt die Geschwindigkeit an. Im Normalbetrieb (du browst in xShip) läuft der Scanner mit voller Geschwindigkeit, weil es keinen Grund gibt, sich zu bremsen.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Auf einen Blick</h2>
+
+<div class="card">
+  <table>
+    <tr><th>Eigenschaft</th><th>Details</th></tr>
+    <tr><td>Start</td><td>Erst wenn xShip geöffnet wird</td></tr>
+    <tr><td>Scan-Frequenz</td><td>Alle 5 Minuten ein Durchlauf</td></tr>
+    <tr><td>Listen-Refresh</td><td>Alle 2 Stunden (einstellbar)</td></tr>
+    <tr><td>Film-Erneuerung</td><td>1 Film alle 5 Min, gelb/rot bevorzugt</td></tr>
+    <tr><td>Max-Limit</td><td>1000 Filme (einstellbar), Trailer/manuell extra</td></tr>
+    <tr><td>Quellen-Gültigkeit</td><td>14 Tage (einstellbar)</td></tr>
+    <tr><td>Drosselung</td><td>Automatisch bei Video, Bildschirmschoner, anderem Addon</td></tr>
+    <tr><td>Trailer-Schutz</td><td>Trailer-Filme werden immer fertig gescannt</td></tr>
+    <tr><td>RAM-Schutz</td><td>SmartTube nur bei genug freiem Speicher</td></tr>
+    <tr><td>DB-Größe</td><td>Typisch 200-500 KB</td></tr>
+  </table>
+</div>
+
+</body>
+</html>

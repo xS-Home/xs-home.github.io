@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xShip - Filme - Im Netz</title>
+<style>
+  :root { --accent: #1a73e8; --bg: #f8f9fa; --card: #fff; --text: #333; --muted: #666; --border: #e0e0e0; --green: #34a853; --yellow: #fbbc04; --red: #ea4335; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; color: var(--accent); margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.15rem; color: var(--text); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  p { margin-bottom: 1rem; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .card-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .step { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.2rem; }
+  .step-num { background: var(--accent); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 1rem; }
+  .step-content { flex: 1; }
+  .example { background: #e8f0fe; border-left: 4px solid var(--accent); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .example strong { color: var(--accent); }
+  .tip { background: #e6f4ea; border-left: 4px solid var(--green); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip strong { color: var(--green); }
+  .warn { background: #fef7e0; border-left: 4px solid var(--yellow); padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn strong { color: #e37400; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); }
+  th { background: var(--bg); font-weight: 600; }
+  ul { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red { background: var(--red); }
+  .flow { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+  .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem; }
+  .flow-arrow { color: var(--accent); font-weight: 700; font-size: 1.2rem; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .compare-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .compare-card h3 { margin-top: 0; color: var(--accent); }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>Filme - Im Netz</h1>
+<p class="subtitle">Neue Filme direkt von den Streaming-Seiten, automatisch in xShip.</p>
+
+<!-- ============================================================ -->
+<h2>Was ist "Filme - Im Netz"?</h2>
+
+<div class="card">
+  <p>Neben den bekannten TMDB-Listen ("Filme - Neu", "Im Trend") gibt es eine weitere Quelle: <strong>die Streaming-Seiten selbst</strong>.</p>
+  <p>xShip besucht automatisch die "Neue Filme"-Seiten der Anbieter (z.B. filmpalast, einschalten) und sammelt die dort gelisteten Filme ein. Diese Filme erscheinen dann als eigene Liste: <strong>"Filme - Im Netz"</strong>.</p>
+</div>
+
+<div class="example">
+  <strong>Beispiel:</strong> filmpalast hat gerade "Thunderbolts" und "Sinners" auf seiner Startseite. einschalten zeigt "The Amateur" und "Thunderbolts". xShip sammelt alle drei Filme ein (ohne Duplikate), holt die Filmdaten von TMDB und zeigt sie dir in einer eigenen Liste mit Poster, Beschreibung und Bewertung.
+</div>
+
+<!-- ============================================================ -->
+<h2>Wo finde ich die Liste?</h2>
+
+<div class="card">
+  <p>Im Hauptmenü unter <strong>Filme</strong>, direkt nach "Filme - Im Trend":</p>
+  <table>
+    <tr><td>Filme - Neu</td><td>Neue Veröffentlichungen (TMDB)</td></tr>
+    <tr><td>Filme - Im Trend</td><td>Aktuell beliebt (TMDB)</td></tr>
+    <tr><td><strong>Filme - Im Netz</strong></td><td>Neu bei den Streaming-Anbietern</td></tr>
+    <tr><td>Filme - Im Kino</td><td>Aktuell im Kino (TMDB)</td></tr>
+    <tr><td>...</td><td></td></tr>
+  </table>
+</div>
+
+<div class="warn">
+  <strong>Hinweis:</strong> Die Liste erscheint erst, wenn mindestens ein Film von den Anbietern gefunden wurde. Beim allerersten Start von xShip kann es einige Minuten dauern, bis die Anbieter durchsucht sind.
+</div>
+
+<!-- ============================================================ -->
+<h2>Warum brauche ich das?</h2>
+
+<div class="compare">
+  <div class="compare-card">
+    <h3>TMDB-Listen</h3>
+    <p>Zeigen Filme basierend auf <strong>offiziellen Veröffentlichungsdaten</strong>. Ein Film taucht hier auf, wenn er offiziell erschienen ist.</p>
+    <p>Manchmal sind Filme dort gelistet, aber noch bei <em>keinem</em> Streaming-Anbieter verfügbar.</p>
+  </div>
+  <div class="compare-card">
+    <h3>Filme - Im Netz</h3>
+    <p>Zeigen Filme, die <strong>tatsächlich bei einem Anbieter verfügbar</strong> sind. Wenn ein Film hier steht, gibt es auch eine Quelle dafür.</p>
+    <p>Manche Filme tauchen hier auf, bevor sie in den TMDB-Listen erscheinen.</p>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Beide Listen ergänzen sich:</strong> TMDB-Listen sind vollständig und gut sortiert. "Im Netz" zeigt, was tatsächlich streambar ist. Zusammen hast du das beste Bild.
+</div>
+
+<!-- ============================================================ -->
+<h2>Wie funktioniert es?</h2>
+
+<div class="card">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content"><strong>Anbieter durchsuchen</strong><br>xShip besucht die "Neue Filme"-Seiten der Streaming-Anbieter und sammelt Filmtitel und Jahreszahlen.</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content"><strong>Abwechselnd zusammenführen</strong><br>Die Ergebnisse der verschiedenen Anbieter werden abwechselnd gemischt: Film 1 von Anbieter A, Film 1 von Anbieter B, Film 2 von Anbieter A, usw. So stehen die neuesten Filme jedes Anbieters oben.</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content"><strong>TMDB-Abgleich</strong><br>Für jeden Film werden die vollständigen Filmdaten von TMDB geholt: Poster, Beschreibung, Bewertung, Erscheinungsjahr. Filme ohne TMDB-Treffer werden übersprungen.</div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content"><strong>In den Cache aufnehmen</strong><br>Die Filme werden im Quellen-Cache gespeichert und automatisch im Hintergrund auf Streaming-Quellen und Qualität geprüft, genau wie Filme aus den TMDB-Listen.</div>
+  </div>
+</div>
+
+<div class="flow">
+  <span class="flow-step">Anbieter-Seiten</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">Titel sammeln</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">Abwechselnd mischen</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">TMDB-Abgleich</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step">Cache + Scan</span>
+  <span class="flow-arrow">&#8594;</span>
+  <span class="flow-step"><span class="dot dot-green"></span><span class="dot dot-yellow"></span><span class="dot dot-red"></span></span>
+</div>
+
+<!-- ============================================================ -->
+<h2>Wie oft wird aktualisiert?</h2>
+
+<div class="card">
+  <p>Die Anbieter werden im gleichen Rhythmus wie die TMDB-Listen aktualisiert: standardmäßig <strong>alle 2 Stunden</strong> (einstellbar unter "TMDB-Listen aktualisieren alle").</p>
+  <p>Neue Filme, die seit dem letzten Durchlauf bei einem Anbieter aufgetaucht sind, werden automatisch zur Liste hinzugefügt. Bereits bekannte Filme werden nicht doppelt angelegt.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Die farbigen Punkte</h2>
+
+<div class="card">
+  <p>Genau wie in allen anderen Filmlisten zeigen die Punkte den Cache-Status:</p>
+  <ul>
+    <li><span class="dot dot-green"></span> <strong>Grün:</strong> HD-Quelle gefunden (720p oder besser)</li>
+    <li><span class="dot dot-yellow"></span> <strong>Gelb:</strong> Quellen vorhanden, aber nur SD</li>
+    <li><span class="dot dot-red"></span> <strong>Rot:</strong> Gesucht, aber keine Quelle gefunden</li>
+    <li><span class="dot" style="background: transparent; border: 2px dashed #ccc;"></span> <strong>Kein Punkt:</strong> Noch nicht gescannt</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2>Häufige Fragen</h2>
+
+<div class="card">
+  <h3>Die Liste "Filme - Im Netz" erscheint nicht. Warum?</h3>
+  <p>Die Liste wird nur angezeigt, wenn mindestens ein Film von den Anbietern gefunden wurde. Mögliche Gründe:</p>
+  <ul>
+    <li>Der Quellen-Cache ist deaktiviert (Einstellungen prüfen)</li>
+    <li>Der Hintergrund-Scan ist deaktiviert oder noch nicht gelaufen</li>
+    <li>Keiner der Anbieter war erreichbar (Cloudflare-Blockade, Netzwerkproblem)</li>
+  </ul>
+  <p>Warte ein paar Minuten nach dem Öffnen von xShip und prüfe dann erneut.</p>
+</div>
+
+<div class="card">
+  <h3>Warum sind manche Filme in "Im Netz" aber nicht in "Neu"?</h3>
+  <p>Die Anbieter listen manchmal Filme, die offiziell noch nicht erschienen sind, oder ältere Filme die gerade neu bei diesem Anbieter verfügbar geworden sind. "Filme - Neu" zeigt nur Filme mit offiziellem Veröffentlichungsdatum der letzten 30 Tage.</p>
+</div>
+
+<div class="card">
+  <h3>Sind das andere Quellen als bei einem normalen Scan?</h3>
+  <p>Nein. Die Filme werden ganz normal über alle verfügbaren Anbieter gescannt, nicht nur über den Anbieter der sie entdeckt hat. "Im Netz" bestimmt nur, <em>welche</em> Filme gescannt werden, nicht <em>wie</em>.</p>
+</div>
+
+<div class="card">
+  <h3>Kann ich einstellen, welche Anbieter durchsucht werden?</h3>
+  <p>Nein, die Anbieter sind fest eingestellt. Es werden automatisch die Anbieter genutzt, die eine "Neue Filme"-Seite haben. In der Precache-Listenauswahl kannst du aber festlegen, ob "Filme - Im Netz" beim Hintergrund-Scan berücksichtigt werden soll.</p>
+</div>
+
+<div class="card">
+  <h3>Belastet das mein Netzwerk zusätzlich?</h3>
+  <p>Minimal. Das Durchsuchen der Anbieter-Seiten dauert wenige Sekunden und passiert nur alle 2 Stunden. Der anschließende TMDB-Abgleich ist ebenfalls schnell, da TMDB-Anfragen gecacht werden. Die Filme werden danach ganz normal im Hintergrund-Scan mit der eingestellten Geschwindigkeit gescannt.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Auf einen Blick</h2>
+
+<div class="card">
+  <table>
+    <tr><th>Eigenschaft</th><th>Details</th></tr>
+    <tr><td>Position im Menü</td><td>Filme > nach "Im Trend"</td></tr>
+    <tr><td>Quelle</td><td>"Neue Filme"-Seiten der Streaming-Anbieter</td></tr>
+    <tr><td>Aktualisierung</td><td>Alle 2 Stunden (einstellbar)</td></tr>
+    <tr><td>Ergebnisse</td><td>Abwechselnd gemischt, TMDB-angereichert, dedupliziert</td></tr>
+    <tr><td>Cache-Integration</td><td>Vollständig (Punkte, Hintergrund-Scan, Probing)</td></tr>
+    <tr><td>Voraussetzung</td><td>Quellen-Cache aktiviert</td></tr>
+    <tr><td>Eigene Einstellungen</td><td>Keine (nutzt Cache-Einstellungen)</td></tr>
+  </table>
+</div>
+
+</body>
+</html>
