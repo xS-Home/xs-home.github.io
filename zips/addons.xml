@@ -42,7 +42,7 @@
     </extension>
 </addon>
 
-<addon id="service.xS.versioncheck" name="xS Version Check" version="1.0.2" provider-name="xS-Team">
+<addon id="service.xS.versioncheck" name="xS Version Check" version="1.0.3" provider-name="xS-Team">
   <requires>
     <import addon="script.module.requests" />
     <!-- for remote debug -->
